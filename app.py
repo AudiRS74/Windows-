@@ -6,156 +6,35 @@ import datetime
 # Attempt to import plotly with error handling
 try:
     import plotly.express as px
-    import plotly.graph_objects as go
     PLOTLY_AVAILABLE = True
-except ImportError as e:
+except ImportError:
     PLOTLY_AVAILABLE = False
-    PLOTLY_ERROR = str(e)
 
-# Set page configuration
-st.set_page_config(
-    page_title="Streamlit DevOps Dashboard",
-    page_icon="🚀",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+st.set_page_config(page_title="Docker Streamlit App", page_icon="🐳")
 
-# Custom CSS
-st.markdown("""
-    <style>
-    .main {
-        background-color: #f5f7f9;
-    }
-    .stMetric {
-        background-color: #ffffff;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    </style>
-    """, unsafe_allow_html=True)
+st.title('Hello from Docker! 🐳')
+st.write('This Streamlit app is running inside a Docker container.')
 
-def main():
-    st.title("🚀 Streamlit DevOps Interactive Dashboard")
-    st.markdown("---")
-
-    if not PLOTLY_AVAILABLE:
-        st.error(f"### ⚠️ Dependency Error\nCould not import Plotly. Please ensure `requirements.txt` is present and contains `plotly`.\n\n**Error details:** {PLOTLY_ERROR}")
-        st.info("Try restarting the app or rebuilding the Docker container.")
-
-    # Sidebar for interactive controls
-    st.sidebar.header("Dashboard Controls")
-
-    app_mode = st.sidebar.selectbox(
-        "Choose the App Mode",
-        ["Home", "Data Explorer", "Visualization", "About"]
-    )
-
-    if app_mode == "Home":
-        show_home()
-    elif app_mode == "Data Explorer":
-        show_data_explorer()
-    elif app_mode == "Visualization":
-        show_visualization()
-    elif app_mode == "About":
-        show_about()
-
-def show_home():
-    st.header("Welcome to your Dockerized Streamlit App!")
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric(label="Status", value="Running", delta="Healthy")
-    with col2:
-        st.metric(label="Environment", value="Docker", delta="Windows 11 Ready")
-    with col3:
-        st.metric(label="Last Updated", value=datetime.datetime.now().strftime("%H:%M:%S"))
-
-    st.info("This application is running inside a Docker container. It's designed to be portable and consistent across different environments.")
-
-    st.subheader("Quick Start Features")
-    st.write("- **Data Explorer**: Generate and filter synthetic data.")
-    st.write("- **Visualization**: Interactive charts using Plotly.")
-    st.write("- **DevOps Ready**: Built-in Docker and GitHub Actions support.")
-
-def show_data_explorer():
-    st.header("📊 Data Explorer")
-
-    # User input for data generation
-    num_rows = st.slider("Select number of rows", min_value=10, max_value=1000, value=100)
-
-    # Generate synthetic data with error handling
-    try:
-        data = pd.DataFrame({
-            'Timestamp': pd.date_range(start='2024-01-01', periods=num_rows, freq='h'),
-            'Value_A': np.random.randn(num_rows).cumsum(),
-            'Value_B': np.random.randn(num_rows).cumsum(),
-            'Category': np.random.choice(['Alpha', 'Beta', 'Gamma', 'Delta'], num_rows)
-        })
-
-        st.write("### Raw Data Preview")
-        st.dataframe(data.head(10), use_container_width=True)
-
-        st.write("### Data Statistics")
-        st.write(data.describe())
-
-        # Download button
-        csv = data.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Download data as CSV",
-            data=csv,
-            file_name='synthetic_data.csv',
-            mime='text/csv',
-        )
-
-    except Exception as e:
-        st.error(f"An error occurred while generating data: {e}")
-
-def show_visualization():
-    st.header("📈 Interactive Visualizations")
-
-    if not PLOTLY_AVAILABLE:
-        st.warning("Visualizations are unavailable because Plotly is not installed.")
-        return
-
-    # Generate some data
+st.header('Sample Data')
+try:
     df = pd.DataFrame({
-        'x': np.random.randn(500),
-        'y': np.random.randn(500),
-        'color': np.random.choice(['Type 1', 'Type 2', 'Type 3'], 500)
+        'Column A': np.random.randn(10),
+        'Column B': np.random.randn(10)
     })
 
-    viz_type = st.radio("Select Visualization Type", ["Scatter Plot", "Histogram", "Line Chart"])
-
-    if viz_type == "Scatter Plot":
-        fig = px.scatter(df, x='x', y='y', color='color', title="Interactive Scatter Plot")
+    if PLOTLY_AVAILABLE:
+        st.subheader("Interactive Plotly Chart")
+        fig = px.line(df, title="Random Walk")
         st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.subheader("Native Streamlit Chart")
+        st.line_chart(df)
 
-    elif viz_type == "Histogram":
-        fig = px.histogram(df, x='x', color='color', barmode='overlay', title="Interactive Histogram")
-        st.plotly_chart(fig, use_container_width=True)
+except Exception as e:
+    st.error(f"Error generating chart: {e}")
 
-    elif viz_type == "Line Chart":
-        chart_data = pd.DataFrame(
-            np.random.randn(20, 3),
-            columns=['A', 'B', 'C']
-        )
-        st.line_chart(chart_data)
+st.header('User Input')
+name = st.text_input('Enter your name', 'World')
+st.write(f'Hello, {name}!')
 
-def show_about():
-    st.header("ℹ️ About this Project")
-    st.write("""
-    This project demonstrates a professional-grade DevOps setup for a Streamlit application.
-
-    **Key Components:**
-    - **Streamlit**: For the interactive web interface.
-    - **Docker**: For containerization and easy deployment.
-    - **GitHub Actions**: For automated building and testing.
-    - **GitHub Codespaces**: For a cloud-based development environment.
-    """)
-
-    st.success("Everything is configured for a seamless 'Mobile -> Cloud -> Desktop' workflow.")
-
-if __name__ == "__main__":
-    main()
+st.sidebar.info(f"Last updated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
