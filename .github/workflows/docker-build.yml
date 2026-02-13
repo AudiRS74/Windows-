@@ -20,5 +20,9 @@ jobs:
     - name: Build Docker image
       run: docker build -t streamlit-app:latest .
 
-    - name: Test image build
+    - name: Test image presence
       run: docker images | grep streamlit-app
+
+    # Optional: Verify if the entrypoint is correct
+    - name: Inspect Entrypoint
+      run: docker inspect streamlit-app:latest | grep windows.py

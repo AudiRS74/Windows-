@@ -2,3 +2,4 @@ build-essential
 curl
 software-properties-common
 libgl1
+git
