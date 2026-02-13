@@ -1,9 +1,16 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
-from datetime import datetime
+import datetime
+
+# Attempt to import plotly with error handling
+try:
+    import plotly.express as px
+    import plotly.graph_objects as go
+    PLOTLY_AVAILABLE = True
+except ImportError as e:
+    PLOTLY_AVAILABLE = False
+    PLOTLY_ERROR = str(e)
 
 # Set page configuration
 st.set_page_config(
@@ -13,7 +20,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS for better styling
+# Custom CSS
 st.markdown("""
     <style>
     .main {
@@ -31,6 +38,10 @@ st.markdown("""
 def main():
     st.title("🚀 Streamlit DevOps Interactive Dashboard")
     st.markdown("---")
+
+    if not PLOTLY_AVAILABLE:
+        st.error(f"### ⚠️ Dependency Error\nCould not import Plotly. Please ensure `requirements.txt` is present and contains `plotly`.\n\n**Error details:** {PLOTLY_ERROR}")
+        st.info("Try restarting the app or rebuilding the Docker container.")
 
     # Sidebar for interactive controls
     st.sidebar.header("Dashboard Controls")
@@ -59,7 +70,7 @@ def show_home():
     with col2:
         st.metric(label="Environment", value="Docker", delta="Windows 11 Ready")
     with col3:
-        st.metric(label="Last Updated", value=datetime.now().strftime("%H:%M:%S"))
+        st.metric(label="Last Updated", value=datetime.datetime.now().strftime("%H:%M:%S"))
 
     st.info("This application is running inside a Docker container. It's designed to be portable and consistent across different environments.")
 
@@ -77,7 +88,7 @@ def show_data_explorer():
     # Generate synthetic data with error handling
     try:
         data = pd.DataFrame({
-            'Timestamp': pd.date_range(start='2024-01-01', periods=num_rows, freq='H'),
+            'Timestamp': pd.date_range(start='2024-01-01', periods=num_rows, freq='h'),
             'Value_A': np.random.randn(num_rows).cumsum(),
             'Value_B': np.random.randn(num_rows).cumsum(),
             'Category': np.random.choice(['Alpha', 'Beta', 'Gamma', 'Delta'], num_rows)
@@ -103,6 +114,10 @@ def show_data_explorer():
 
 def show_visualization():
     st.header("📈 Interactive Visualizations")
+
+    if not PLOTLY_AVAILABLE:
+        st.warning("Visualizations are unavailable because Plotly is not installed.")
+        return
 
     # Generate some data
     df = pd.DataFrame({
