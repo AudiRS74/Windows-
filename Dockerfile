@@ -1,21 +1,22 @@
 # Use a specific version of the Python slim image for a small footprint
 FROM python:3.11-slim-bookworm
 
-# Set environment variables to prevent Python from writing .pyc files and buffering stdout/stderr
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies required for some Python packages
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     software-properties-common \
+    libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy only the requirements file first to leverage Docker cache
+# Copy requirements file first
 COPY requirements.txt .
 
 # Install Python dependencies
@@ -27,7 +28,7 @@ COPY . .
 # Expose the port that Streamlit uses
 EXPOSE 8501
 
-# Healthcheck to ensure the container is running correctly
+# Healthcheck
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 # Command to run the Streamlit application
