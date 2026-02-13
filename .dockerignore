@@ -1,0 +1,17 @@
+.git
+.github
+.devcontainer
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.db
+.sqlite3
+.env
+.venv
+env/
+venv/
+node_modules/
+.vscode
+.idea
+*.log
