@@ -70,4 +70,4 @@ Start-Process "http://localhost:8501"
 ## 🧪 Stability & Troubleshooting
 - **Dependency Handling**: `app.py` includes `try-except` blocks for Plotly imports to ensure the app loads even if dependencies fail.
 - **System Packages**: `packages.txt` ensures necessary Linux libraries are available on Streamlit Cloud and Codespaces.
-- **Versions**: All libraries are pinned (e.g., `streamlit==1.35.0`) for maximum consistency.
+- **Versions**: All libraries are pinned (e.g., `streamlit==1.29.0`) for maximum consistency.
